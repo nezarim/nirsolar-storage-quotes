@@ -40,6 +40,20 @@ function init() {
     document.getElementById('hero-customer').textContent = quoteData.customer.name;
     document.getElementById('hero-date').textContent = new Date(quoteData.created).toLocaleDateString('he-IL');
 
+    // Set rep info
+    const repKey = quoteData.rep || 'default';
+    const rep = (typeof REPS !== 'undefined' && REPS[repKey]) || (typeof REPS !== 'undefined' && REPS['default']) || null;
+    if (rep) {
+        const repNameEl = document.getElementById('rep-name');
+        const repPhoneEl = document.getElementById('rep-phone');
+        const repWaEl = document.getElementById('rep-whatsapp');
+        const repCallEl = document.getElementById('rep-call');
+        if (repNameEl) repNameEl.textContent = rep.displayName;
+        if (repPhoneEl) repPhoneEl.innerHTML = '<a href="tel:+' + rep.phoneIntl + '">' + rep.phone + '</a>';
+        if (repWaEl) repWaEl.href = 'https://wa.me/' + rep.phoneIntl + '?text=' + encodeURIComponent('היי, קיבלתי הצעת מחיר לאגירה ואשמח לפרטים נוספים');
+        if (repCallEl) repCallEl.href = 'tel:+' + rep.phoneIntl;
+    }
+
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('quote-app').classList.remove('hidden');
 

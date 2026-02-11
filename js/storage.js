@@ -59,4 +59,10 @@ const DB = {
     }
 };
 
+// Sales rep profiles
+const REPS = {
+    'admin': { displayName: 'גיל נסהופר', role: 'מחלקת אגירה - ניר סולאר', phone: '050-901-4074', phoneIntl: '972509014074' },
+    'default': { displayName: 'גיל נסהופר', role: 'מחלקת אגירה - ניר סולאר', phone: '050-901-4074', phoneIntl: '972509014074' }
+};
+
 DB.init();
