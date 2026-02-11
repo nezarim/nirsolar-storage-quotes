@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניר סולאר - הצעת מחיר לאגירת אנרגיה</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/quote.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div id="loading" class="loading-screen">
+        <img src="logo.png" alt="Nir Solar" class="logo">
+        <div class="spinner"></div>
+        <p>טוען הצעת מחיר...</p>
+    </div>
+
+    <div id="quote-app" class="hidden">
+        <!-- Hero -->
+        <div class="hero">
+            <img src="logo.png" alt="Nir Solar" class="logo">
+            <h1>הצעת מחיר</h1>
+            <h2>מערכת אגירת אנרגיה</h2>
+            <p class="customer-name" id="hero-customer"></p>
+            <p class="quote-date" id="hero-date"></p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="container">
+            <div class="summary-cards">
+                <div class="summary-card green">
+                    <div class="card-icon">💰</div>
+                    <div class="card-value" id="sum-irr">-</div>
+                    <div class="card-label">IRR</div>
+                </div>
+                <div class="summary-card blue">
+                    <div class="card-icon">📊</div>
+                    <div class="card-value" id="sum-npv">-</div>
+                    <div class="card-label">NPV (6%)</div>
+                </div>
+                <div class="summary-card gold">
+                    <div class="card-icon">🏆</div>
+                    <div class="card-value" id="sum-profit">-</div>
+                    <div class="card-label">רווח 25 שנה</div>
+                </div>
+                <div class="summary-card purple">
+                    <div class="card-icon">⏱️</div>
+                    <div class="card-value" id="sum-payback">-</div>
+                    <div class="card-label">החזר השקעה</div>
+                </div>
+            </div>
+
+            <!-- Interactive Controls -->
+            <div class="section">
+                <h3>התאמה אישית</h3>
+                <p class="section-desc">שנה את הפרמטרים וצפה בתוצאות מתעדכנות בזמן אמת</p>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label>יצרן אגירה</label>
+                        <select id="ctrl-manufacturer" onchange="recalculate()">
+                            <option value="JINKO">JINKO (266 kWh, $220/kWh)</option>
+                            <option value="FFD">FFD (233 kWh, $180/kWh)</option>
+                            <option value="SOLAREDGE">SOLAREDGE (197 kWh, $230/kWh)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>קיבולת אגירה (kWh): <span id="lbl-storage">532</span></label>
+                        <input type="range" id="ctrl-storage" min="100" max="2000" value="532" step="10" oninput="updateLabel(this,'lbl-storage');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>תעריף PV (₪/kWh): <span id="lbl-tariff">0.42</span></label>
+                        <input type="range" id="ctrl-tariff" min="0.30" max="0.60" value="0.42" step="0.01" oninput="updateLabel(this,'lbl-tariff');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>אחוז הלוואה: <span id="lbl-loan">70</span>%</label>
+                        <input type="range" id="ctrl-loan" min="0" max="100" value="70" step="5" oninput="updateLabel(this,'lbl-loan');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>ריבית: <span id="lbl-interest">5.5</span>%</label>
+                        <input type="range" id="ctrl-interest" min="3" max="10" value="5.5" step="0.1" oninput="updateLabel(this,'lbl-interest');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>תקופה (שנים): <span id="lbl-period">22</span></label>
+                        <input type="range" id="ctrl-period" min="10" max="25" value="22" step="1" oninput="updateLabel(this,'lbl-period');recalculate()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Details -->
+            <div class="section">
+                <h3>פרטי מערכת</h3>
+                <div class="details-grid" id="system-details"></div>
+            </div>
+
+            <!-- Charts -->
+            <div class="section">
+                <h3>תזרים מזומנים שנתי</h3>
+                <div class="chart-container">
+                    <canvas id="cashflow-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>תזרים מצטבר</h3>
+                <div class="chart-container">
+                    <canvas id="cumulative-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Cash Flow Table -->
+            <div class="section">
+                <h3>טבלת תזרים מזומנים</h3>
+                <div class="table-scroll">
+                    <table id="cashflow-table">
+                        <thead>
+                            <tr>
+                                <th>שנה</th>
+                                <th>הכנסות</th>
+                                <th>הוצאות</th>
+                                <th>החזר הלוואה</th>
+                                <th>תזרים נטו</th>
+                                <th>מצטבר</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cashflow-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <img src="logo.png" alt="Nir Solar" class="logo-small">
+                <p>ניר סולאר - פתרונות אנרגיה מתקדמים</p>
+                <p class="small">הצעת מחיר זו תקפה ל-30 יום מתאריך ההנפקה</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="not-found" class="hidden">
+        <div class="error-screen">
+            <img src="logo.png" alt="Nir Solar" class="logo">
+            <h1>הצעת המחיר לא נמצאה</h1>
+            <p>הקישור שגוי או שפג תוקפו</p>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/financial.js"></script>
+    <script src="js/quote-page.js"></script>
+</body>
+</html>

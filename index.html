@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניר סולאר - מערכת הצעות מחיר</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen active">
+            <div class="login-card">
+                <img src="logo.png" alt="Nir Solar" class="logo">
+                <h1>מערכת הצעות מחיר</h1>
+                <h2>אגירת אנרגיה</h2>
+                <div class="form-group">
+                    <label>שם נציג</label>
+                    <input type="text" id="rep-name" placeholder="הכנס שם">
+                </div>
+                <div class="form-group">
+                    <label>סיסמה</label>
+                    <input type="password" id="rep-pass" placeholder="סיסמה">
+                </div>
+                <button class="btn btn-primary" onclick="login()">כניסה</button>
+                <p class="hint">ברירת מחדל: admin / admin</p>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard-screen" class="screen">
+            <header>
+                <div class="header-right">
+                    <img src="logo.png" alt="Nir Solar" class="logo-small">
+                    <span id="welcome-text"></span>
+                </div>
+                <div class="header-left">
+                    <button class="btn btn-primary" onclick="showNewQuote()">+ הצעה חדשה</button>
+                    <button class="btn btn-secondary" onclick="logout()">יציאה</button>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-number" id="stat-total">0</div>
+                        <div class="stat-label">סה"כ הצעות</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="stat-viewed">0</div>
+                        <div class="stat-label">נצפו</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="stat-pending">0</div>
+                        <div class="stat-label">ממתינות</div>
+                    </div>
+                </div>
+
+                <div class="quotes-table-wrap">
+                    <h3>הצעות מחיר</h3>
+                    <table id="quotes-table">
+                        <thead>
+                            <tr>
+                                <th>תאריך</th>
+                                <th>לקוח</th>
+                                <th>חברה</th>
+                                <th>טלפון</th>
+                                <th>יצרן</th>
+                                <th>קיבולת (kWh)</th>
+                                <th>צפיות</th>
+                                <th>סטטוס</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quotes-body"></tbody>
+                    </table>
+                    <p id="no-quotes" class="empty-state">אין הצעות מחיר עדיין. צור הצעה חדשה!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Quote Form -->
+        <div id="new-quote-screen" class="screen">
+            <header>
+                <div class="header-right">
+                    <img src="logo.png" alt="Nir Solar" class="logo-small">
+                    <span>הצעת מחיר חדשה</span>
+                </div>
+                <div class="header-left">
+                    <button class="btn btn-secondary" onclick="showDashboard()">חזרה</button>
+                </div>
+            </header>
+
+            <div class="form-content">
+                <div class="form-section">
+                    <h3>פרטי לקוח</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>שם לקוח *</label>
+                            <input type="text" id="q-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>חברה</label>
+                            <input type="text" id="q-company">
+                        </div>
+                        <div class="form-group">
+                            <label>טלפון</label>
+                            <input type="tel" id="q-phone">
+                        </div>
+                        <div class="form-group">
+                            <label>אימייל</label>
+                            <input type="email" id="q-email">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>פרטי מערכת PV קיימת</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>הספק PV מותקן DC (kW)</label>
+                            <input type="number" id="q-pv-dc" value="400" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label>הספק PV קיים AC (kW)</label>
+                            <input type="number" id="q-pv-ac" value="330" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label>תוספת PV DC (kW)</label>
+                            <input type="number" id="q-pv-add" value="0" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>פרטי אגירה</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>יצרן</label>
+                            <select id="q-manufacturer">
+                                <option value="JINKO">JINKO (266 kWh, $220/kWh)</option>
+                                <option value="FFD">FFD (233 kWh, $180/kWh)</option>
+                                <option value="SOLAREDGE">SOLAREDGE (197 kWh, $230/kWh)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>קיבולת אגירה מבוקשת (kWh)</label>
+                            <input type="number" id="q-storage-kwh" value="532" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label>תקופה נותרת (שנים)</label>
+                            <input type="number" id="q-period" value="22" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>מימון</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>אחוז הלוואה (%)</label>
+                            <input type="number" id="q-loan-pct" value="70" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label>אחוז הון עצמי (%)</label>
+                            <input type="number" id="q-equity-pct" value="30" step="1" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>ריבית שנתית (%)</label>
+                            <input type="number" id="q-interest" value="5.5" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>תקופת הלוואה (שנים)</label>
+                            <input type="number" id="q-loan-period" value="12" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary btn-large" onclick="createQuote()">צור הצעת מחיר</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/financial.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
