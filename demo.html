@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניר סולאר - הצעת מחיר לדוגמא</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/quote.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+    // Inject demo data into localStorage before storage.js loads
+    const demoQuote = {
+        id: 'demo_test',
+        customer: { name: 'חברת דוגמא בע"מ', company: 'חברת דוגמא בע"מ', phone: '050-1234567', email: 'demo@example.com' },
+        params: {
+            pvDC: 70, pvAC: 50, pvAdditional: 130, pvYield: 1600,
+            manufacturer: 'SOLAREDGE', storageKwh: 500,
+            pvTariff: 0.42, pvInstallCostPerKwp: 2550,
+            pvMaintenancePerKwp: 50, storageMaintenancePerKwh: 5,
+            period: 22, loanPct: 0, interestRate: 7, loanPeriod: 20
+        },
+        created: new Date().toISOString(),
+        rep: 'demo',
+        views: 0
+    };
+    const existing = JSON.parse(localStorage.getItem('nirsolar_quotes') || '[]');
+    const idx = existing.findIndex(q => q.id === 'demo_test');
+    if (idx >= 0) existing[idx] = demoQuote; else existing.push(demoQuote);
+    localStorage.setItem('nirsolar_quotes', JSON.stringify(existing));
+    // Redirect to real quote page with demo id
+    if (!window.location.search.includes('id=')) {
+        window.location.href = 'quote.html?id=demo_test';
+    }
+    </script>
+</head>
+<body>
+    <div style="text-align:center;padding:60px 20px;font-family:Assistant,sans-serif;">
+        <p>מעביר לדף הצעת מחיר לדוגמא...</p>
+        <p><a href="quote.html?id=demo_test">לחץ כאן אם הדף לא נטען</a></p>
+    </div>
+</body>
+</html>

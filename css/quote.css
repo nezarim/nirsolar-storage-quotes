@@ -9,13 +9,13 @@
 .loading-screen p { margin-top: 10px; color: var(--text-light); }
 
 .hero {
-    background: linear-gradient(135deg, #1e6b3a 0%, #2d8a4e 50%, #4CAF50 100%);
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://www.nirsolar.com/files/homepage/source/energy_1.png') center/cover;
     color: white;
     text-align: center;
     padding: 60px 20px 50px;
 }
-.hero .logo { height: 60px; margin-bottom: 20px; filter: brightness(0) invert(1); }
-.hero h1 { font-size: 36px; margin-bottom: 8px; }
+.hero .logo { height: 70px; margin-bottom: 20px; filter: brightness(0) invert(1); }
+.hero h1 { font-size: 36px; margin-bottom: 8px; font-weight: 700; }
 .hero h2 { font-size: 20px; font-weight: 400; opacity: 0.9; margin-bottom: 20px; }
 .hero .customer-name { font-size: 22px; font-weight: 600; }
 .hero .quote-date { font-size: 14px; opacity: 0.8; margin-top: 8px; }
@@ -54,6 +54,7 @@
     box-shadow: var(--shadow);
 }
 .section h3 { color: var(--primary); margin-bottom: 16px; font-size: 20px; }
+.section h4 { margin-top: 20px; color: var(--primary); }
 .section-desc { color: var(--text-light); font-size: 14px; margin-bottom: 20px; }
 
 .controls-grid {
@@ -111,13 +112,46 @@ input[type="range"]::-webkit-slider-thumb {
 .table-scroll { overflow-x: auto; }
 .table-scroll table { min-width: 600px; }
 
-.footer {
+/* Info Card */
+.info-card {
+    background: var(--primary-light);
+    border-right: 4px solid var(--primary);
+    padding: 24px 28px;
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+}
+.info-card h3 { color: var(--primary); margin-bottom: 12px; font-size: 20px; }
+.info-card p { color: var(--text); font-size: 15px; line-height: 1.7; margin-bottom: 12px; }
+.info-card a {
+    display: inline-block;
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid var(--primary);
+    transition: opacity 0.2s;
+}
+.info-card a:hover { opacity: 0.8; }
+
+/* Footer */
+.site-footer {
+    background: #1a1a2e;
+    color: #ccc;
     text-align: center;
     padding: 40px 20px;
-    color: var(--text-light);
+    margin-top: 20px;
 }
-.footer .logo-small { margin-bottom: 12px; opacity: 0.6; }
-.footer .small { font-size: 12px; margin-top: 8px; }
+.site-footer .footer-logo { height: 50px; margin-bottom: 16px; }
+.site-footer .tagline { font-size: 16px; color: #fff; margin-bottom: 16px; font-weight: 600; }
+.site-footer .footer-links { margin-bottom: 16px; }
+.site-footer .footer-links a {
+    color: var(--primary);
+    text-decoration: none;
+    margin: 0 12px;
+    font-size: 14px;
+}
+.site-footer .footer-links a:hover { text-decoration: underline; }
+.site-footer .footer-phone { font-size: 18px; color: #fff; margin-bottom: 12px; direction: ltr; }
+.site-footer .footer-note { font-size: 12px; color: #888; margin-top: 12px; }
 
 .error-screen {
     display: flex;
