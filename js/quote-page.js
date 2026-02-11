@@ -13,11 +13,28 @@ function init() {
 
     // Set controls from saved params
     const p = quoteData.params;
-    document.getElementById('ctrl-manufacturer').value = p.manufacturer;
-    setSlider('ctrl-storage', 'lbl-storage', p.storageKwh);
-    setSlider('ctrl-period', 'lbl-period', p.period);
-    setSlider('ctrl-loan', 'lbl-loan', p.loanPct);
-    setSlider('ctrl-interest', 'lbl-interest', p.interestRate);
+    
+    // PV system
+    setSlider('ctrl-pvdc', 'lbl-pvdc', p.pvDC || 70);
+    setSlider('ctrl-pvac', 'lbl-pvac', p.pvAC || 50);
+    setSlider('ctrl-pvadd', 'lbl-pvadd', p.pvAdditional || 130);
+    setSlider('ctrl-yield', 'lbl-yield', p.pvYield || 1600);
+    
+    // Storage
+    document.getElementById('ctrl-manufacturer').value = p.manufacturer || 'SOLAREDGE';
+    setSlider('ctrl-storage', 'lbl-storage', p.storageKwh || 500);
+    
+    // Financial
+    setSlider('ctrl-tariff', 'lbl-tariff', p.pvTariff || 0.42);
+    setSlider('ctrl-pvcost', 'lbl-pvcost', p.pvInstallCostPerKwp || 2550);
+    setSlider('ctrl-pvmaint', 'lbl-pvmaint', p.pvMaintenancePerKwp || 50);
+    setSlider('ctrl-stmaint', 'lbl-stmaint', p.storageMaintenancePerKwh || 5);
+    setSlider('ctrl-period', 'lbl-period', p.period || 22);
+    
+    // Loan
+    setSlider('ctrl-loan', 'lbl-loan', p.loanPct || 0);
+    setSlider('ctrl-interest', 'lbl-interest', p.interestRate || 7);
+    setSlider('ctrl-loanperiod', 'lbl-loanperiod', p.loanPeriod || 20);
 
     // Hero
     document.getElementById('hero-customer').textContent = quoteData.customer.name;
@@ -48,16 +65,20 @@ function recalculate() {
     if (!quoteData) return;
 
     const params = {
-        pvDC: quoteData.params.pvDC,
-        pvAC: quoteData.params.pvAC,
-        pvAdditional: quoteData.params.pvAdditional,
+        pvDC: +document.getElementById('ctrl-pvdc').value,
+        pvAC: +document.getElementById('ctrl-pvac').value,
+        pvAdditional: +document.getElementById('ctrl-pvadd').value,
+        pvYield: +document.getElementById('ctrl-yield').value,
         manufacturer: document.getElementById('ctrl-manufacturer').value,
         storageKwh: +document.getElementById('ctrl-storage').value,
         pvTariff: +document.getElementById('ctrl-tariff').value,
+        pvInstallCostPerKwp: +document.getElementById('ctrl-pvcost').value,
+        pvMaintenancePerKwp: +document.getElementById('ctrl-pvmaint').value,
+        storageMaintenancePerKwh: +document.getElementById('ctrl-stmaint').value,
         period: +document.getElementById('ctrl-period').value,
         loanPct: +document.getElementById('ctrl-loan').value,
         interestRate: +document.getElementById('ctrl-interest').value,
-        loanPeriod: quoteData.params.loanPeriod
+        loanPeriod: +document.getElementById('ctrl-loanperiod').value
     };
 
     const result = calculateFinancials(params);

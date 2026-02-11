@@ -54,6 +54,28 @@
             <div class="section">
                 <h3>התאמה אישית</h3>
                 <p class="section-desc">שנה את הפרמטרים וצפה בתוצאות מתעדכנות בזמן אמת</p>
+                
+                <h4 style="margin-top: 20px; color: #2d8a4e;">מערכת PV</h4>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label>PV DC קיים (kWp): <span id="lbl-pvdc">70</span></label>
+                        <input type="range" id="ctrl-pvdc" min="0" max="500" value="70" step="10" oninput="updateLabel(this,'lbl-pvdc');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>AC PV קיים (kW): <span id="lbl-pvac">50</span></label>
+                        <input type="range" id="ctrl-pvac" min="0" max="400" value="50" step="5" oninput="updateLabel(this,'lbl-pvac');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>PV DC נוסף (kWp): <span id="lbl-pvadd">130</span></label>
+                        <input type="range" id="ctrl-pvadd" min="0" max="500" value="130" step="10" oninput="updateLabel(this,'lbl-pvadd');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>תפוקה שנתית (kWh/kWp): <span id="lbl-yield">1600</span></label>
+                        <input type="range" id="ctrl-yield" min="1200" max="2000" value="1600" step="50" oninput="updateLabel(this,'lbl-yield');recalculate()">
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #2d8a4e;">מערכת אגירה</h4>
                 <div class="controls-grid">
                     <div class="control-group">
                         <label>יצרן אגירה</label>
@@ -64,24 +86,48 @@
                         </select>
                     </div>
                     <div class="control-group">
-                        <label>קיבולת אגירה (kWh): <span id="lbl-storage">532</span></label>
-                        <input type="range" id="ctrl-storage" min="100" max="2000" value="532" step="10" oninput="updateLabel(this,'lbl-storage');recalculate()">
+                        <label>קיבולת אגירה (kWh): <span id="lbl-storage">500</span></label>
+                        <input type="range" id="ctrl-storage" min="100" max="2000" value="500" step="10" oninput="updateLabel(this,'lbl-storage');recalculate()">
                     </div>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #2d8a4e;">כספים</h4>
+                <div class="controls-grid">
                     <div class="control-group">
-                        <label>תעריף PV (₪/kWh): <span id="lbl-tariff">0.42</span></label>
+                        <label>תעריף אסדרה PV (₪/kWh): <span id="lbl-tariff">0.42</span></label>
                         <input type="range" id="ctrl-tariff" min="0.30" max="0.60" value="0.42" step="0.01" oninput="updateLabel(this,'lbl-tariff');recalculate()">
                     </div>
                     <div class="control-group">
-                        <label>אחוז הלוואה: <span id="lbl-loan">70</span>%</label>
-                        <input type="range" id="ctrl-loan" min="0" max="100" value="70" step="5" oninput="updateLabel(this,'lbl-loan');recalculate()">
+                        <label>עלות הקמה PV (₪/kWp): <span id="lbl-pvcost">2550</span></label>
+                        <input type="range" id="ctrl-pvcost" min="2000" max="4000" value="2550" step="50" oninput="updateLabel(this,'lbl-pvcost');recalculate()">
                     </div>
                     <div class="control-group">
-                        <label>ריבית: <span id="lbl-interest">5.5</span>%</label>
-                        <input type="range" id="ctrl-interest" min="3" max="10" value="5.5" step="0.1" oninput="updateLabel(this,'lbl-interest');recalculate()">
+                        <label>תחזוקה PV (₪/kWp/year): <span id="lbl-pvmaint">50</span></label>
+                        <input type="range" id="ctrl-pvmaint" min="20" max="100" value="50" step="5" oninput="updateLabel(this,'lbl-pvmaint');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>תחזוקה אגירה (₪/kWh/year): <span id="lbl-stmaint">5</span></label>
+                        <input type="range" id="ctrl-stmaint" min="2" max="15" value="5" step="1" oninput="updateLabel(this,'lbl-stmaint');recalculate()">
                     </div>
                     <div class="control-group">
                         <label>תקופה (שנים): <span id="lbl-period">22</span></label>
                         <input type="range" id="ctrl-period" min="10" max="25" value="22" step="1" oninput="updateLabel(this,'lbl-period');recalculate()">
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #2d8a4e;">מימון</h4>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label>אחוז הלוואה: <span id="lbl-loan">0</span>%</label>
+                        <input type="range" id="ctrl-loan" min="0" max="100" value="0" step="5" oninput="updateLabel(this,'lbl-loan');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>ריבית: <span id="lbl-interest">7</span>%</label>
+                        <input type="range" id="ctrl-interest" min="3" max="12" value="7" step="0.1" oninput="updateLabel(this,'lbl-interest');recalculate()">
+                    </div>
+                    <div class="control-group">
+                        <label>תקופת הלוואה (שנים): <span id="lbl-loanperiod">20</span></label>
+                        <input type="range" id="ctrl-loanperiod" min="5" max="25" value="20" step="1" oninput="updateLabel(this,'lbl-loanperiod');recalculate()">
                     </div>
                 </div>
             </div>

@@ -116,19 +116,23 @@
                 </div>
 
                 <div class="form-section">
-                    <h3>פרטי מערכת PV קיימת</h3>
+                    <h3>פרטי מערכת PV</h3>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>הספק PV מותקן DC (kW)</label>
-                            <input type="number" id="q-pv-dc" value="400" step="1">
+                            <label>PV DC קיים (kWp)</label>
+                            <input type="number" id="q-pv-dc" value="70" step="10">
                         </div>
                         <div class="form-group">
-                            <label>הספק PV קיים AC (kW)</label>
-                            <input type="number" id="q-pv-ac" value="330" step="1">
+                            <label>AC PV קיים (kW)</label>
+                            <input type="number" id="q-pv-ac" value="50" step="5">
                         </div>
                         <div class="form-group">
-                            <label>תוספת PV DC (kW)</label>
-                            <input type="number" id="q-pv-add" value="0" step="1">
+                            <label>PV DC נוסף (kWp)</label>
+                            <input type="number" id="q-pv-add" value="130" step="10">
+                        </div>
+                        <div class="form-group">
+                            <label>תפוקה שנתית (kWh/kWp)</label>
+                            <input type="number" id="q-pv-yield" value="1600" step="50">
                         </div>
                     </div>
                 </div>
@@ -141,16 +145,38 @@
                             <select id="q-manufacturer">
                                 <option value="JINKO">JINKO (266 kWh, $220/kWh)</option>
                                 <option value="FFD">FFD (233 kWh, $180/kWh)</option>
-                                <option value="SOLAREDGE">SOLAREDGE (197 kWh, $230/kWh)</option>
+                                <option value="SOLAREDGE" selected>SOLAREDGE (197 kWh, $230/kWh)</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>קיבולת אגירה מבוקשת (kWh)</label>
-                            <input type="number" id="q-storage-kwh" value="532" step="1">
+                            <input type="number" id="q-storage-kwh" value="500" step="10">
                         </div>
                         <div class="form-group">
-                            <label>תקופה נותרת (שנים)</label>
+                            <label>תקופה (שנים)</label>
                             <input type="number" id="q-period" value="22" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>כספים ותחזוקה</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>תעריף אסדרה PV (₪/kWh)</label>
+                            <input type="number" id="q-pv-tariff" value="0.42" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>עלות הקמה PV (₪/kWp)</label>
+                            <input type="number" id="q-pv-cost" value="2550" step="50">
+                        </div>
+                        <div class="form-group">
+                            <label>תחזוקה PV (₪/kWp/year)</label>
+                            <input type="number" id="q-pv-maint" value="50" step="5">
+                        </div>
+                        <div class="form-group">
+                            <label>תחזוקה אגירה (₪/kWh/year)</label>
+                            <input type="number" id="q-st-maint" value="5" step="1">
                         </div>
                     </div>
                 </div>
@@ -160,19 +186,15 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>אחוז הלוואה (%)</label>
-                            <input type="number" id="q-loan-pct" value="70" step="1">
-                        </div>
-                        <div class="form-group">
-                            <label>אחוז הון עצמי (%)</label>
-                            <input type="number" id="q-equity-pct" value="30" step="1" readonly>
+                            <input type="number" id="q-loan-pct" value="0" step="5">
                         </div>
                         <div class="form-group">
                             <label>ריבית שנתית (%)</label>
-                            <input type="number" id="q-interest" value="5.5" step="0.1">
+                            <input type="number" id="q-interest" value="7" step="0.1">
                         </div>
                         <div class="form-group">
                             <label>תקופת הלוואה (שנים)</label>
-                            <input type="number" id="q-loan-period" value="12" step="1">
+                            <input type="number" id="q-loan-period" value="20" step="1">
                         </div>
                     </div>
                 </div>

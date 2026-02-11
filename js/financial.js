@@ -6,7 +6,7 @@ const MANUFACTURERS = {
     SOLAREDGE: { unitKwh: 197, usdPerKwh: 230 }
 };
 
-const USD_TO_NIS = 3.7; // Approximate exchange rate
+const USD_TO_NIS = 3.25; // Exchange rate used in Excel model
 
 // ToU Tariffs (low voltage) - ag/kWh (agorot per kWh)
 const SEASONS = {
@@ -16,12 +16,11 @@ const SEASONS = {
 };
 
 const TOTAL_PEAK_HOURS = 1443;
-// Max discharge per kW AC per season (kWh)
-const MAX_DISCHARGE = { winter: 22500, transition: 24750, summer: 24900 };
-const TOTAL_MAX_DISCHARGE = 72150;
+const LOSS_FACTOR = 0.05;  // J17 in Excel: (1-RTE)/2 where RTE=0.9
 
 const DEFAULTS = {
     pvTariff: 0.42,           // NIS/kWh
+    pvYield: 1600,            // kWh/kWp/year
     pvDegradation: 0.005,     // 0.5% per year
     storageDegradation: 0.015,// 1.5% per year
     rte: 0.90,                // Round trip efficiency
@@ -36,27 +35,31 @@ const DEFAULTS = {
 
 function calculateFinancials(params) {
     const {
-        pvDC = 400,
-        pvAC = 330,
-        pvAdditional = 0,
-        manufacturer = 'JINKO',
-        storageKwh = 532,
+        pvDC = 70,
+        pvAC = 50,
+        pvAdditional = 130,
+        pvYield = DEFAULTS.pvYield,
+        manufacturer = 'SOLAREDGE',
+        storageKwh = 500,
         pvTariff = DEFAULTS.pvTariff,
+        pvInstallCostPerKwp = DEFAULTS.pvInstallCostPerKwp,
+        pvMaintenancePerKwp = DEFAULTS.pvMaintenancePerKwp,
+        storageMaintenancePerKwh = DEFAULTS.storageMaintenancePerKwh,
         period = 22,
-        loanPct = 70,
-        interestRate = 5.5,
-        loanPeriod = 12
+        loanPct = 0,
+        interestRate = 7,
+        loanPeriod = 20
     } = params;
 
     const mfr = MANUFACTURERS[manufacturer];
     const totalPvDC = pvDC + pvAdditional;
 
-    // Number of storage units needed
-    const numUnits = Math.ceil(storageKwh / mfr.unitKwh);
+    // Number of storage units needed (ROUNDDOWN like Excel)
+    const numUnits = Math.floor(storageKwh / mfr.unitKwh);
     const actualStorageKwh = numUnits * mfr.unitKwh;
 
     // Installation costs
-    const pvAdditionalCost = pvAdditional * DEFAULTS.pvInstallCostPerKwp;
+    const pvAdditionalCost = pvAdditional * pvInstallCostPerKwp;
     const storageCostUSD = actualStorageKwh * mfr.usdPerKwh;
     const storageCostNIS = storageCostUSD * USD_TO_NIS;
     const totalInstallCost = pvAdditionalCost + storageCostNIS;
@@ -92,34 +95,37 @@ function calculateFinancials(params) {
             effectiveStorageKwh += actualStorageKwh * DEFAULTS.augmentationPct;
         }
 
-        // Revenue: peak income per season
+        // Revenue: peak income per season (using supplementary tariff)
+        // Formula from Excel: MIN(dailyCapacity * peakDays * (1-lossFactor), maxACperSeason) * supplementaryTariff
         let peakIncome = 0;
-        let gridChargingCost = 0;
+        
         for (const [season, data] of Object.entries(SEASONS)) {
-            // Peak kWh this season based on storage capacity and AC power
-            const maxSeasonDischarge = storageACkW * (MAX_DISCHARGE[season] / 1000); // convert to kWh for this system
-            const seasonPeakKwh = Math.min(effectiveStorageKwh * data.peakDays * DEFAULTS.rte, maxSeasonDischarge);
+            // Max discharge for this season based on AC power (kW * hours)
+            const maxACperSeason = pvAC * data.peakHours;
+            
+            // Actual discharge: MIN(daily capacity * peak days * efficiency, AC limit)
+            const dailyCapacity = effectiveStorageKwh;
+            const seasonDischargeKwh = Math.min(
+                dailyCapacity * data.peakDays * (1 - LOSS_FACTOR),
+                maxACperSeason
+            );
             
             // Revenue from supplementary tariff (ag/kWh → NIS/kWh: divide by 100)
-            peakIncome += seasonPeakKwh * (data.supplementary / 100);
-
-            // Grid charging cost (charge at off-peak to discharge at peak)
-            const chargeNeeded = seasonPeakKwh / DEFAULTS.rte;
-            gridChargingCost += chargeNeeded * (data.offPeak / 100);
+            peakIncome += seasonDischargeKwh * (data.supplementary / 100);
         }
-
-        // Apply degradation to revenue
-        peakIncome *= stDegFactor;
+        
+        // No grid charging cost - all charging comes from PV surplus
+        const gridChargingCost = 0;
         
         // Surplus PV sales
-        const surplusKwh = totalPvDC * 1200 * pvDegFactor * 0.1; // ~10% surplus estimate
+        const surplusKwh = totalPvDC * pvYield * pvDegFactor * 0.1; // ~10% surplus estimate
         const surplusIncome = surplusKwh * pvTariff;
 
         const totalRevenue = peakIncome + surplusIncome;
 
         // Costs
-        const pvMaintenance = totalPvDC * DEFAULTS.pvMaintenancePerKwp;
-        const storageMaintenance = actualStorageKwh * DEFAULTS.storageMaintenancePerKwh;
+        const pvMaintenance = totalPvDC * pvMaintenancePerKwp;
+        const storageMaintenance = actualStorageKwh * storageMaintenancePerKwh;
         const totalCosts = pvMaintenance + storageMaintenance + gridChargingCost + augmentationCost;
 
         const loanPayment = y <= loanPeriod ? annualLoanPayment : 0;
