@@ -219,7 +219,5 @@ function deleteRepAction(name) {
     }
 }
 
-// Enter key on login
-document.getElementById('rep-pass').addEventListener('keypress', e => {
-    if (e.key === 'Enter') login();
-});
+// login-card style fix for form
+document.querySelector('.login-card form .btn').style.width = '100%';

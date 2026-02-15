@@ -15,15 +15,17 @@
                 <img src="logo.png" alt="Nir Solar" class="logo">
                 <h1>מערכת הצעות מחיר</h1>
                 <h2>אגירת אנרגיה</h2>
-                <div class="form-group">
-                    <label>שם נציג</label>
-                    <input type="text" id="rep-name" placeholder="הכנס שם">
-                </div>
-                <div class="form-group">
-                    <label>סיסמה</label>
-                    <input type="password" id="rep-pass" placeholder="סיסמה">
-                </div>
-                <button class="btn btn-primary" onclick="login()">כניסה</button>
+                <form onsubmit="event.preventDefault();login();" autocomplete="on">
+                    <div class="form-group">
+                        <label>שם נציג</label>
+                        <input type="text" id="rep-name" name="username" placeholder="הכנס שם" autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label>סיסמה</label>
+                        <input type="password" id="rep-pass" name="password" placeholder="סיסמה" autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">כניסה</button>
+                </form>
                 <p class="hint">ברירת מחדל: admin / admin</p>
             </div>
         </div>
