@@ -1,31 +1,53 @@
 // Simple localStorage-based storage
+
+// ── Password hashing (SHA-256) ──
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 const DB = {
     _key: 'nirsolar_quotes',
     _reps: 'nirsolar_reps',
 
-    init() {
-        // Migrate old reps format → new format with profile fields
+    async init() {
         const raw = localStorage.getItem(this._reps);
         if (raw) {
             const reps = JSON.parse(raw);
-            if (reps.length && !('displayName' in reps[0])) {
-                // Old format: [{name, pass}] → add profile fields from legacy REPS
-                const legacy = {
-                    'admin': { displayName: 'גיל נסהופר', phone: '050-901-4074', phoneIntl: '972509014074' }
-                };
-                const migrated = reps.map(r => ({
-                    name: r.name,
-                    pass: r.pass,
-                    displayName: (legacy[r.name] && legacy[r.name].displayName) || r.name,
-                    phone: (legacy[r.name] && legacy[r.name].phone) || '',
-                    phoneIntl: (legacy[r.name] && legacy[r.name].phoneIntl) || ''
-                }));
-                localStorage.setItem(this._reps, JSON.stringify(migrated));
+            let needsSave = false;
+
+            // Migrate: plain text 'pass' → hashed 'passHash'
+            for (let i = 0; i < reps.length; i++) {
+                const r = reps[i];
+                if (r.pass && !r.passHash) {
+                    r.passHash = await hashPassword(r.pass);
+                    delete r.pass;
+                    needsSave = true;
+                }
+                // Migrate old format without displayName
+                if (!('displayName' in r)) {
+                    if (r.name === 'admin') {
+                        r.displayName = 'גיל נסהופר';
+                        r.phone = '050-901-4074';
+                        r.phoneIntl = '972509014074';
+                    } else {
+                        r.displayName = r.name;
+                        r.phone = r.phone || '';
+                        r.phoneIntl = r.phoneIntl || '';
+                    }
+                    needsSave = true;
+                }
+            }
+            if (needsSave) {
+                localStorage.setItem(this._reps, JSON.stringify(reps));
             }
         } else {
-            // First run – seed default admin
+            // First run – seed default admin with hashed password
+            const adminHash = await hashPassword('admin');
             localStorage.setItem(this._reps, JSON.stringify([
-                { name: 'admin', pass: 'admin', displayName: 'גיל נסהופר', phone: '050-901-4074', phoneIntl: '972509014074' }
+                { name: 'admin', passHash: adminHash, displayName: 'גיל נסהופר', phone: '050-901-4074', phoneIntl: '972509014074' }
             ]));
         }
 
@@ -44,18 +66,33 @@ const DB = {
         return this.getReps();
     },
 
-    authenticate(name, pass) {
+    async authenticate(name, pass) {
         const reps = this.getReps();
-        return reps.find(r => r.name === name && r.pass === pass);
+        const hash = await hashPassword(pass);
+        return reps.find(r => r.name === name && r.passHash === hash);
     },
 
-    saveRep(rep) {
+    async saveRep(rep) {
         const reps = this.getReps();
         const idx = reps.findIndex(r => r.name === rep.name);
+
+        // Build storage object (never store plain password)
+        const stored = {
+            name: rep.name,
+            passHash: rep.passHash, // already hashed by caller
+            displayName: rep.displayName || '',
+            phone: rep.phone || '',
+            phoneIntl: rep.phoneIntl || ''
+        };
+
         if (idx >= 0) {
-            reps[idx] = rep;
+            // Keep existing hash if no new one provided
+            if (!stored.passHash) {
+                stored.passHash = reps[idx].passHash;
+            }
+            reps[idx] = stored;
         } else {
-            reps.push(rep);
+            reps.push(stored);
         }
         localStorage.setItem(this._reps, JSON.stringify(reps));
         buildRepsLookup();
@@ -118,7 +155,6 @@ function buildRepsLookup() {
             phoneIntl: r.phoneIntl || ''
         };
     });
-    // Fallback default
     if (!REPS['default'] && REPS['admin']) {
         REPS['default'] = REPS['admin'];
     } else if (!REPS['default']) {
@@ -126,5 +162,5 @@ function buildRepsLookup() {
     }
 }
 
-DB.init();
-buildRepsLookup();
+// Init is async – callers should await DB.ready
+DB.ready = DB.init().then(() => buildRepsLookup());

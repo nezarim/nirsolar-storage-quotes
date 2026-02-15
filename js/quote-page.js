@@ -235,10 +235,10 @@ function hideRepLogin(e) {
     document.getElementById('rep-login-overlay').classList.add('hidden');
 }
 
-function doRepLogin() {
+async function doRepLogin() {
     const user = document.getElementById('rep-username').value.trim();
     const pass = document.getElementById('rep-password').value;
-    const rep = DB.authenticate(user, pass);
+    const rep = await DB.authenticate(user, pass);
     if (!rep) {
         document.getElementById('rep-login-error').classList.remove('hidden');
         return;

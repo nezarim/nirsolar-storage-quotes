@@ -1,10 +1,10 @@
 // Dashboard logic
 let currentRep = null;
 
-function login() {
+async function login() {
     const name = document.getElementById('rep-name').value.trim();
     const pass = document.getElementById('rep-pass').value;
-    const rep = DB.authenticate(name, pass);
+    const rep = await DB.authenticate(name, pass);
     if (rep) {
         currentRep = rep;
         showDashboard();
@@ -157,23 +157,23 @@ function openRepModal(editName) {
     const editingInput = document.getElementById('rm-editing');
 
     if (editName) {
-        // Edit mode
         const rep = DB.getAllReps().find(r => r.name === editName);
         if (!rep) return;
         titleEl.textContent = 'עריכת נציג';
         nameInput.value = rep.name;
         nameInput.disabled = true;
-        passInput.value = rep.pass;
+        passInput.value = '';
+        passInput.placeholder = 'השאר ריק לשמור סיסמה קיימת';
         displayInput.value = rep.displayName || '';
         phoneInput.value = rep.phone || '';
         phoneIntlInput.value = rep.phoneIntl || '';
         editingInput.value = editName;
     } else {
-        // New mode
         titleEl.textContent = 'נציג חדש';
         nameInput.value = '';
         nameInput.disabled = false;
         passInput.value = '';
+        passInput.placeholder = 'סיסמה';
         displayInput.value = '';
         phoneInput.value = '';
         phoneIntlInput.value = '';
@@ -186,7 +186,7 @@ function closeRepModal() {
     document.getElementById('rep-modal').classList.add('hidden');
 }
 
-function saveRepModal() {
+async function saveRepModal() {
     const editingName = document.getElementById('rm-editing').value;
     const name = document.getElementById('rm-name').value.trim();
     const pass = document.getElementById('rm-pass').value;
@@ -195,7 +195,9 @@ function saveRepModal() {
     const phoneIntl = document.getElementById('rm-phone-intl').value.trim();
 
     if (!name) { alert('נא להזין שם משתמש'); return; }
-    if (!pass) { alert('נא להזין סיסמה'); return; }
+
+    // New rep must have a password
+    if (!editingName && !pass) { alert('נא להזין סיסמה'); return; }
 
     // Check duplicate on new rep
     if (!editingName) {
@@ -203,7 +205,10 @@ function saveRepModal() {
         if (existing) { alert('שם משתמש כבר קיים'); return; }
     }
 
-    DB.saveRep({ name, pass, displayName, phone, phoneIntl });
+    // Hash password if provided, otherwise null (saveRep keeps existing)
+    const passHash = pass ? await hashPassword(pass) : null;
+
+    await DB.saveRep({ name, passHash, displayName, phone, phoneIntl });
     closeRepModal();
     renderReps();
 }
