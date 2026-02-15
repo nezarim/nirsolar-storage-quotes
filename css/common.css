@@ -11,13 +11,13 @@
     --purple: #9c27b0;
     --text: #1a1a2e;
     --text-light: #666;
-    --bg: #f5f7fa;
+    --bg: #f5f8fd;
     --white: #fff;
     --border: #e0e4e8;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-    --radius: 12px;
-    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(0,53,138,0.08);
+    --shadow-lg: 0 8px 30px rgba(0,53,138,0.12);
+    --radius: 8px;
+    --radius-sm: 6px;
 }
 
 body {

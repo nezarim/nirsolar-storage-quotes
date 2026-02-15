@@ -31,10 +31,6 @@ function showDashboard() {
 
 function showNewQuote() {
     switchScreen('new-quote-screen');
-    // Sync loan/equity
-    document.getElementById('q-loan-pct').addEventListener('input', function() {
-        document.getElementById('q-equity-pct').value = 100 - this.value;
-    });
 }
 
 function renderQuotes() {
@@ -124,6 +120,102 @@ function deleteQuote(id) {
     if (confirm('למחוק את ההצעה?')) {
         DB.deleteQuote(id);
         renderQuotes();
+    }
+}
+
+// ── Reps Management ──
+
+function showRepsScreen() {
+    switchScreen('reps-screen');
+    renderReps();
+}
+
+function renderReps() {
+    const reps = DB.getAllReps();
+    const tbody = document.getElementById('reps-body');
+    tbody.innerHTML = reps.map(r => `
+        <tr>
+            <td>${r.name}</td>
+            <td>${r.displayName || '-'}</td>
+            <td>${r.phone || '-'}</td>
+            <td>
+                <button class="btn btn-small btn-primary" onclick="openRepModal('${r.name}')">עריכה</button>
+                <button class="btn btn-small btn-danger" onclick="deleteRepAction('${r.name}')">מחיקה</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openRepModal(editName) {
+    const modal = document.getElementById('rep-modal');
+    const titleEl = document.getElementById('rep-modal-title');
+    const nameInput = document.getElementById('rm-name');
+    const passInput = document.getElementById('rm-pass');
+    const displayInput = document.getElementById('rm-display');
+    const phoneInput = document.getElementById('rm-phone');
+    const phoneIntlInput = document.getElementById('rm-phone-intl');
+    const editingInput = document.getElementById('rm-editing');
+
+    if (editName) {
+        // Edit mode
+        const rep = DB.getAllReps().find(r => r.name === editName);
+        if (!rep) return;
+        titleEl.textContent = 'עריכת נציג';
+        nameInput.value = rep.name;
+        nameInput.disabled = true;
+        passInput.value = rep.pass;
+        displayInput.value = rep.displayName || '';
+        phoneInput.value = rep.phone || '';
+        phoneIntlInput.value = rep.phoneIntl || '';
+        editingInput.value = editName;
+    } else {
+        // New mode
+        titleEl.textContent = 'נציג חדש';
+        nameInput.value = '';
+        nameInput.disabled = false;
+        passInput.value = '';
+        displayInput.value = '';
+        phoneInput.value = '';
+        phoneIntlInput.value = '';
+        editingInput.value = '';
+    }
+    modal.classList.remove('hidden');
+}
+
+function closeRepModal() {
+    document.getElementById('rep-modal').classList.add('hidden');
+}
+
+function saveRepModal() {
+    const editingName = document.getElementById('rm-editing').value;
+    const name = document.getElementById('rm-name').value.trim();
+    const pass = document.getElementById('rm-pass').value;
+    const displayName = document.getElementById('rm-display').value.trim();
+    const phone = document.getElementById('rm-phone').value.trim();
+    const phoneIntl = document.getElementById('rm-phone-intl').value.trim();
+
+    if (!name) { alert('נא להזין שם משתמש'); return; }
+    if (!pass) { alert('נא להזין סיסמה'); return; }
+
+    // Check duplicate on new rep
+    if (!editingName) {
+        const existing = DB.getAllReps().find(r => r.name === name);
+        if (existing) { alert('שם משתמש כבר קיים'); return; }
+    }
+
+    DB.saveRep({ name, pass, displayName, phone, phoneIntl });
+    closeRepModal();
+    renderReps();
+}
+
+function deleteRepAction(name) {
+    if (name === 'admin') {
+        alert('לא ניתן למחוק את משתמש admin');
+        return;
+    }
+    if (confirm(`למחוק את הנציג "${name}"?`)) {
+        DB.deleteRep(name);
+        renderReps();
     }
 }
 

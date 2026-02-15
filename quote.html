@@ -28,22 +28,22 @@
         <!-- Summary Cards -->
         <div class="container">
             <div class="summary-cards">
-                <div class="summary-card green">
+                <div class="summary-card">
                     <div class="card-icon">💰</div>
                     <div class="card-value" id="sum-irr">-</div>
                     <div class="card-label">IRR</div>
                 </div>
-                <div class="summary-card blue">
+                <div class="summary-card">
                     <div class="card-icon">📊</div>
                     <div class="card-value" id="sum-npv">-</div>
                     <div class="card-label">NPV (6%)</div>
                 </div>
-                <div class="summary-card gold">
+                <div class="summary-card">
                     <div class="card-icon">🏆</div>
                     <div class="card-value" id="sum-profit">-</div>
                     <div class="card-label">רווח 25 שנה</div>
                 </div>
-                <div class="summary-card purple">
+                <div class="summary-card">
                     <div class="card-icon">⏱️</div>
                     <div class="card-value" id="sum-payback">-</div>
                     <div class="card-label">החזר השקעה</div>
@@ -129,6 +129,11 @@
                         <label>תקופת הלוואה (שנים): <span id="lbl-loanperiod">20</span></label>
                         <input type="range" id="ctrl-loanperiod" min="5" max="25" value="20" step="1" oninput="updateLabel(this,'lbl-loanperiod');recalculate()">
                     </div>
+                </div>
+
+                <div class="rep-login-area">
+                    <button id="btn-rep-login" class="btn-rep-login" onclick="showRepLogin()">🔒 כניסת נציג</button>
+                    <span id="rep-badge" class="rep-badge hidden">✓ מצב נציג</span>
                 </div>
             </div>
 
@@ -216,6 +221,25 @@
             <img src="logo.png" alt="Nir Solar" class="logo">
             <h1>הצעת המחיר לא נמצאה</h1>
             <p>הקישור שגוי או שפג תוקפו</p>
+        </div>
+    </div>
+
+    <!-- Rep Login Modal -->
+    <div id="rep-login-overlay" class="rep-overlay hidden" onclick="hideRepLogin(event)">
+        <div class="rep-login-card">
+            <img src="logo.png" alt="Nir Solar" class="logo">
+            <h2>כניסת נציג</h2>
+            <p class="login-subtitle">מערכת הצעות מחיר</p>
+            <div class="form-group">
+                <label>שם נציג</label>
+                <input type="text" id="rep-username" placeholder="הכנס שם" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label>סיסמה</label>
+                <input type="password" id="rep-password" placeholder="סיסמה" autocomplete="current-password" onkeydown="if(event.key==='Enter')doRepLogin()">
+            </div>
+            <p id="rep-login-error" class="login-error hidden">שם משתמש או סיסמה שגויים</p>
+            <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="doRepLogin()">כניסה</button>
         </div>
     </div>
 

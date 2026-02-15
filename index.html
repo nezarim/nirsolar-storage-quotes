@@ -37,6 +37,7 @@
                 </div>
                 <div class="header-left">
                     <button class="btn btn-primary" onclick="showNewQuote()">+ הצעה חדשה</button>
+                    <button class="btn btn-secondary" onclick="showRepsScreen()">ניהול נציגים</button>
                     <button class="btn btn-secondary" onclick="logout()">יציאה</button>
                 </div>
             </header>
@@ -76,6 +77,71 @@
                         <tbody id="quotes-body"></tbody>
                     </table>
                     <p id="no-quotes" class="empty-state">אין הצעות מחיר עדיין. צור הצעה חדשה!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reps Management -->
+        <div id="reps-screen" class="screen">
+            <header>
+                <div class="header-right">
+                    <img src="logo.png" alt="Nir Solar" class="logo-small">
+                    <span>ניהול נציגים</span>
+                </div>
+                <div class="header-left">
+                    <button class="btn btn-secondary" onclick="showDashboard()">חזרה</button>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <div class="reps-table-wrap">
+                    <h3>
+                        <span>נציגי מכירות</span>
+                        <button class="btn btn-primary" onclick="openRepModal()">+ נציג חדש</button>
+                    </h3>
+                    <table id="reps-table">
+                        <thead>
+                            <tr>
+                                <th>שם משתמש</th>
+                                <th>שם תצוגה</th>
+                                <th>טלפון</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reps-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rep Add/Edit Modal -->
+        <div id="rep-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeRepModal()">
+            <div class="modal-card">
+                <h2 id="rep-modal-title">נציג חדש</h2>
+                <input type="hidden" id="rm-editing">
+                <div class="form-group">
+                    <label>שם משתמש</label>
+                    <input type="text" id="rm-name" placeholder="שם להתחברות">
+                </div>
+                <div class="form-group">
+                    <label>סיסמה</label>
+                    <input type="password" id="rm-pass" placeholder="סיסמה">
+                </div>
+                <div class="form-group">
+                    <label>שם תצוגה</label>
+                    <input type="text" id="rm-display" placeholder="שם מלא להצגה ללקוח">
+                </div>
+                <div class="form-group">
+                    <label>טלפון</label>
+                    <input type="tel" id="rm-phone" placeholder="050-XXX-XXXX">
+                </div>
+                <div class="form-group">
+                    <label>טלפון בינלאומי (ללא +)</label>
+                    <input type="tel" id="rm-phone-intl" placeholder="97250XXXXXXX">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="saveRepModal()">שמור</button>
+                    <button class="btn btn-secondary" onclick="closeRepModal()">ביטול</button>
                 </div>
             </div>
         </div>

@@ -2,6 +2,7 @@
 let quoteData = null;
 let cashflowChart = null;
 let cumulativeChart = null;
+let repMode = false;
 
 function init() {
     const params = new URLSearchParams(window.location.search);
@@ -56,6 +57,9 @@ function init() {
 
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('quote-app').classList.remove('hidden');
+
+    // Lock controls by default (customer cannot change sliders)
+    lockControls();
 
     recalculate();
 }
@@ -194,6 +198,57 @@ function updateTable(r) {
             <td style="color:${cf.cumulative >= 0 ? '#2d8a4e' : '#e53935'};font-weight:600">${formatNIS(cf.cumulative)}</td>
         </tr>
     `).join('');
+}
+
+// ── Controls lock/unlock ──
+
+function lockControls() {
+    const section = document.querySelector('.section');
+    if (!section) return;
+    section.querySelectorAll('input[type="range"], select').forEach(el => {
+        el.disabled = true;
+    });
+    section.classList.add('controls-locked');
+}
+
+function unlockControls() {
+    const section = document.querySelector('.section');
+    if (!section) return;
+    section.querySelectorAll('input[type="range"], select').forEach(el => {
+        el.disabled = false;
+    });
+    section.classList.remove('controls-locked');
+}
+
+// ── Rep login modal ──
+
+function showRepLogin() {
+    document.getElementById('rep-login-overlay').classList.remove('hidden');
+    document.getElementById('rep-login-error').classList.add('hidden');
+    document.getElementById('rep-username').value = '';
+    document.getElementById('rep-password').value = '';
+    setTimeout(() => document.getElementById('rep-username').focus(), 100);
+}
+
+function hideRepLogin(e) {
+    if (e && e.target !== e.currentTarget) return;
+    document.getElementById('rep-login-overlay').classList.add('hidden');
+}
+
+function doRepLogin() {
+    const user = document.getElementById('rep-username').value.trim();
+    const pass = document.getElementById('rep-password').value;
+    const rep = DB.authenticate(user, pass);
+    if (!rep) {
+        document.getElementById('rep-login-error').classList.remove('hidden');
+        return;
+    }
+    // Success - unlock controls
+    repMode = true;
+    unlockControls();
+    document.getElementById('rep-login-overlay').classList.add('hidden');
+    document.getElementById('btn-rep-login').classList.add('hidden');
+    document.getElementById('rep-badge').classList.remove('hidden');
 }
 
 // Init on load
